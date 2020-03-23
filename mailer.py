@@ -76,11 +76,11 @@ for item in mail:
 				if isinstance(attachment.item, Message):
 					processLetter(attachment.item, True)
 			
-			if len(attachs) > 0:
-				for a in attachs:
-					if len (a[0]) > 0 and len(a[1]) > 0:
-						ufile = post(vk_api.docs.getMessagesUploadServer(type = 'doc', peer_id = chat_id)['upload_url'], files = {'file': a}).json()['file']
-						u = vk_api.docs.save(file = ufile, title = a[0])['doc']
-						uploadedattachs+='doc%s_%s,'%(u['owner_id'], u['id'])
-				uploadedattachs=uploadedattachs[:-1]
-				vk_api.messages.send(peer_id=chat_id, message='Вложения:', attachment = uploadedattachs, random_id=random.getrandbits(64))
+		if len(attachs) > 0:
+			for a in attachs:
+				if len (a[0]) > 0 and len(a[1]) > 0:
+					ufile = post(vk_api.docs.getMessagesUploadServer(type = 'doc', peer_id = chat_id)['upload_url'], files = {'file': a}).json()['file']
+					u = vk_api.docs.save(file = ufile, title = a[0])['doc']
+					uploadedattachs+='doc%s_%s,'%(u['owner_id'], u['id'])
+			uploadedattachs=uploadedattachs[:-1]
+			vk_api.messages.send(peer_id=chat_id, me
