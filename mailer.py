@@ -23,8 +23,8 @@ mail = list(account.inbox.all().order_by('-datetime_received')[:10]) + list(acco
 	
 	
 def processLetter(item, attached=False):
-	sender = item.sender.name + '(' + item.sender.email_address + ')' if item.sender.name is not None and len (item.sender.name) > 0 else item.sender.email_address
-	subj = ' с темой "'+item.subject+'"' if item.subject is not None else ' без темы'
+	sender = item.sender.name + ' (' + item.sender.email_address + ')' if item.sender.name is not None and len (item.sender.name) > 0 else item.sender.email_address
+	subj = ' с темой «'+item.subject+'»' if item.subject is not None else ' без темы'
 	if item.sender.email_address == 'tskobeleva@hse.ru' and item.subject is None:
 		subj = ', как обычно, без темы'
 	if attached:
