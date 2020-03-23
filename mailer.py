@@ -17,9 +17,6 @@ group_email = 'groupemail@edu.hse.ru'
 vk_api = vk.API(session, v='5.103')
 credentials = Credentials(mail_login, mail_password)
 account = Account(mail_login, credentials=credentials, autodiscover=True)
-
-
-mail = list(account.inbox.all().order_by('-datetime_received')[:10]) + list(account.sent.all().order_by('-datetime_received')[:10])
 	
 	
 def processLetter(item, attached=False):
@@ -55,7 +52,12 @@ with open('lastletter.txt', 'r') as content_file:
 
 written = False
 
-for item in mail:
+
+
+dmail = list(account.inbox.all().only('to_recipients', 'cc_recipients', 'bcc_recipients', 'datetime_received').order_by('-datetime_received')[:10]) + list(account.sent.all().only('to_recipients', 'cc_recipients', 'bcc_recipients', 'datetime_received').order_by('-datetime_received')[:10])
+dmail = sorted(dmail, key = lambda i: i.datetime_received, reverse=True)
+	
+for item in dmail:
 	if group_email in item.to_recipients or item.cc_recipients is not None and group_email in item.cc_recipients or item.bcc_recipients is not None and group_email in item.bcc_recipients:
 		if str(item.datetime_received) == str(last_email):
 			exit(0)
@@ -63,6 +65,14 @@ for item in mail:
 			written = True
 			with open("lastletter.txt","w+") as f:
 				f.write (str(item.datetime_received))
+				
+mail = list(account.inbox.all().order_by('-datetime_received')[:10]) + list(account.sent.all().order_by('-datetime_received')[:10])
+mail = sorted(mail, key = lambda i: i.datetime_received, reverse=True)
+
+for item in mail:
+	if group_email in item.to_recipients or item.cc_recipients is not None and group_email in item.cc_recipients or item.bcc_recipients is not None and group_email in item.bcc_recipients:
+		if str(item.datetime_received) == str(last_email):
+			exit(0)
 		processLetter(item)
 		attachs = list()
 		uploadedattachs = ''
