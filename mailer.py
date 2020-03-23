@@ -83,4 +83,4 @@ for item in mail:
 					u = vk_api.docs.save(file = ufile, title = a[0])['doc']
 					uploadedattachs+='doc%s_%s,'%(u['owner_id'], u['id'])
 			uploadedattachs=uploadedattachs[:-1]
-			vk_api.messages.send(peer_id=chat_id, me
+			vk_api.messages.send(peer_id=chat_id, message='Вложения:', attachment = uploadedattachs, random_id=random.getrandbits(64))
