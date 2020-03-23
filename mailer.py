@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 
 vk_bad_files = ('html', 'htm', 'zip', 'exe', 'rar', 'js')
 
-chat_id = 2000000002
+chat_id = 2000000002 #id of your group chat
 mail_login = 'myemail@edu.hse.ru'
 mail_password = 'mypassword'
 session = vk.Session(access_token='VKTOKEN')
