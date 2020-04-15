@@ -36,7 +36,7 @@ def processLetter(item, attached=False):
 	if not BeautifulSoup(item.body, "html.parser").find():
 		vk_api.messages.send(peer_id=chat_id, message='Содержание письма:\n' + item.body, random_id=random.getrandbits(64))
 	else:
-		picture = imgkit.from_string(item.body, False)
+		picture = imgkit.from_string(item.body, False, options={ 'load-error-handling': 'ignore', 'load-media-error-handling': 'ignore', 'disable-local-file-access': None, 'quiet': None})
 		pfile = post(vk_api.photos.getMessagesUploadServer(peer_id = chat_id)['upload_url'], files = {'photo': ('pic.png', picture)}).json()
 		photo = vk_api.photos.saveMessagesPhoto(server = pfile['server'], photo = pfile['photo'], hash = pfile['hash'])[0]
 		vk_api.messages.send(peer_id=chat_id, message='Содержание письма:', attachment = 'photo%s_%s'%(photo['owner_id'], photo['id']), random_id=random.getrandbits(64))
@@ -79,9 +79,9 @@ for item in mail:
 		for attachment in item.attachments:
 			if isinstance(attachment, FileAttachment):
 				if attachment.name.split('.')[-1] in vk_bad_files:
-					attachs.append((attachment.name+'.vkpisossosi', attachment.content))
+					attachs.append((translit(attachment.name, 'ru', reversed=True)+'.vkpisossosi', attachment.content))
 				else:
-					attachs.append((attachment.name, attachment.content))
+					attachs.append((translit(attachment.name, 'ru', reversed=True), attachment.content))
 			elif isinstance(attachment, ItemAttachment):
 				if isinstance(attachment.item, Message):
 					processLetter(attachment.item, True)
