@@ -4,6 +4,7 @@ from exchangelib import Credentials, Account, FileAttachment, ItemAttachment
 import random
 from requests import post
 from bs4 import BeautifulSoup
+from transliterate import translit
 
 
 vk_bad_files = ('html', 'htm', 'zip', 'exe', 'rar', 'js')
