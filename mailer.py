@@ -59,7 +59,7 @@ dmail = list(account.inbox.all().only('to_recipients', 'cc_recipients', 'bcc_rec
 dmail = sorted(dmail, key = lambda i: i.datetime_received, reverse=True)
 	
 for item in dmail:
-	if group_email in item.to_recipients or item.cc_recipients is not None and group_email in item.cc_recipients or item.bcc_recipients is not None and group_email in item.bcc_recipients:
+	if item.to_recipients is not None and group_email in item.to_recipients or item.cc_recipients is not None and group_email in item.cc_recipients or item.bcc_recipients is not None and group_email in item.bcc_recipients:
 		if str(item.datetime_received) == str(last_email) and not written:
 			exit(0)
 		if not written:
@@ -71,7 +71,7 @@ mail = list(account.inbox.all().order_by('-datetime_received')[:10]) + list(acco
 mail = sorted(mail, key = lambda i: i.datetime_received, reverse=True)
 
 for item in mail:
-	if group_email in item.to_recipients or item.cc_recipients is not None and group_email in item.cc_recipients or item.bcc_recipients is not None and group_email in item.bcc_recipients:
+	if item.to_recipients is not None and group_email in item.to_recipients or item.cc_recipients is not None and group_email in item.cc_recipients or item.bcc_recipients is not None and group_email in item.bcc_recipients:
 		if str(item.datetime_received) == str(last_email):
 			exit(0)
 		processLetter(item)
