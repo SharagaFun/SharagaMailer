@@ -18,7 +18,15 @@ group_email = 'groupemail@edu.hse.ru'
 vk_api = vk.API(session, v='5.103')
 credentials = Credentials(mail_login, mail_password)
 account = Account(mail_login, credentials=credentials, autodiscover=True)
+
+def getGreeting():
+	greetingsList = ('Пщ пщ... Bleep Bloop...', 'БЛЯЯЯ, Я ПИСЬМО ПОЙМАЛ!1', 'Дзынь!', 'Вам повестка! Возможно...', 'Опять хуйню пишут', 'Ура, новый спам!', 'Все! Не звони и не пиши мне больше! Ах ты...', 'Пщщщ... в эфире ваша любимая рубрика «письма счастья»!', 'Мля, письмо словил')
+	return random.choice(greetingsList)
 	
+def printPlain(text):
+	if len(text)<10:
+		text += '\n(По всей видимости, текст письма отсутствует)'
+	vk_api.messages.send(peer_id=chat_id, message='Содержание письма:\n' + text, random_id=random.getrandbits(64))
 	
 def processLetter(item, attached=False):
 	sender = item.sender.name + ' (' + item.sender.email_address + ')' if item.sender.name is not None and len (item.sender.name) > 0 else item.sender.email_address
@@ -28,23 +36,34 @@ def processLetter(item, attached=False):
 	if attached:
 		msg = 'Вложенное письмо от '+sender+subj
 	else:
-		msg = 'Пщ пщ... Bleep Bloop...\n'+sender+' пишет нам письмо'+subj
-		
+		msg = getGreeting()+'\n\n'+sender+' пишет нам письмо'+subj
+	
+	if item.body is None:
+		vk_api.messages.send(peer_id=chat_id, message=msg+'. И оно пустое :(', random_id=random.getrandbits(64))
+		return
 	if 'срочно' in item.body.lower():
 		msg += '\n БЕГИТЕ ЧИТАТЬ РОНЯЯ КАЛ, ПОСАНЫ!11'
 	
-	vk_api.messages.send(peer_id=chat_id, message='Пщ пщ... Bleep Bloop...\n\n'+sender+' пишет нам письмо'+subj, random_id=random.getrandbits(64))
+	vk_api.messages.send(peer_id=chat_id, message=msg, random_id=random.getrandbits(64))
 	if not BeautifulSoup(item.body, "html.parser").find():
-		vk_api.messages.send(peer_id=chat_id, message='Содержание письма:\n' + item.body, random_id=random.getrandbits(64))
+		printPlain(item.body)
 	else:
-		picture = imgkit.from_string(item.body, False, options={ 'load-error-handling': 'ignore', 'load-media-error-handling': 'ignore', 'disable-local-file-access': None, 'quiet': None})
-		pfile = post(vk_api.photos.getMessagesUploadServer(peer_id = chat_id)['upload_url'], files = {'photo': ('pic.png', picture)}).json()
-		photo = vk_api.photos.saveMessagesPhoto(server = pfile['server'], photo = pfile['photo'], hash = pfile['hash'])[0]
-		vk_api.messages.send(peer_id=chat_id, message='Содержание письма:', attachment = 'photo%s_%s'%(photo['owner_id'], photo['id']), random_id=random.getrandbits(64))
 		soup = BeautifulSoup(item.body, 'lxml')
-		links = [a.get('href') for a in soup.find_all('a', href=True)]
-		if links is not None and len(links) > 0:
-			vk_api.messages.send(peer_id=chat_id, message='Ссылки из письма:\n'+'\n'.join(set(links)), random_id=random.getrandbits(64))		
+		try:
+			picture = imgkit.from_string(item.body, False, options={ 'load-error-handling': 'ignore', 'load-media-error-handling': 'ignore', 'disable-local-file-access': None, 'quiet': None})
+			width, height = Image.open(BytesIO(picture)).size
+			if (width < 50 or height < 50):
+				printPlain(soup.text)
+			else:
+				pfile = post(vk_api.photos.getMessagesUploadServer(peer_id = chat_id)['upload_url'], files = {'photo': ('pic.png', picture)}).json()
+				photo = vk_api.photos.saveMessagesPhoto(server = pfile['server'], photo = pfile['photo'], hash = pfile['hash'])[0]
+				vk_api.messages.send(peer_id=chat_id, message='Содержание письма:', attachment = 'photo%s_%s'%(photo['owner_id'], photo['id']), random_id=random.getrandbits(64))
+				links = [a.get('href') for a in soup.find_all('a', href=True)]
+				if links is not None and len(links) > 0:
+					vk_api.messages.send(peer_id=chat_id, message='Ссылки из письма:\n'+'\n'.join(set(links)), random_id=random.getrandbits(64))
+		except Exception as ex:
+			vk_api.messages.send(peer_id=chat_id, message='Не удалось отрендерить содержимое HTML. Вылетел эксепшн '+type(ex).__name__+'. Вывожу тело сообщения обычным текстом:', random_id=random.getrandbits(64))
+			printPlain(soup.text)
 	
 
 with open('lastletter.txt', 'r') as content_file:
