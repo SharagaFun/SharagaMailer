@@ -5,6 +5,7 @@ import random
 from requests import post
 from bs4 import BeautifulSoup
 from transliterate import translit
+import base64
 
 
 vk_bad_files = ('html', 'htm', 'zip', 'exe', 'rar', 'js')
