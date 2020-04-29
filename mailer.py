@@ -27,7 +27,7 @@ def getGreeting():
 def printPlain(text):
 	if len(text)<10:
 		text += '\n(По всей видимости, текст письма отсутствует)'
-	vk_api.messages.send(peer_id=chat_id, message='Содержание письма:\n' + text, random_id=random.getrandbits(64))
+	vk_api.messages.send(peer_id=chat_id, message='Содержимое письма:\n' + text, random_id=random.getrandbits(64))
 	
 def replaceAttachmentWithBase64(text, attachs):
 	for attachment in attachs:
