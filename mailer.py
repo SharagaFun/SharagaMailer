@@ -28,6 +28,12 @@ def printPlain(text):
 		text += '\n(По всей видимости, текст письма отсутствует)'
 	vk_api.messages.send(peer_id=chat_id, message='Содержание письма:\n' + text, random_id=random.getrandbits(64))
 	
+def replaceAttachmentWithBase64(text, attachs):
+	for attachment in attachs:
+		if 'cid:'+attachment.content_id in text:
+			text = text.replace('cid:'+attachment.content_id, 'data:'+attachment.content_type+';base64,'+base64.b64encode(attachment.content).decode())
+	return text
+	
 def processLetter(item, attached=False):
 	sender = item.sender.name + ' (' + item.sender.email_address + ')' if item.sender.name is not None and len (item.sender.name) > 0 else item.sender.email_address
 	subj = ' с темой «'+item.subject+'»' if item.subject is not None else ' без темы'
@@ -62,7 +68,7 @@ def processLetter(item, attached=False):
 				if links is not None and len(links) > 0:
 					vk_api.messages.send(peer_id=chat_id, message='Ссылки из письма:\n'+'\n'.join(set(links)), random_id=random.getrandbits(64))
 		except Exception as ex:
-			vk_api.messages.send(peer_id=chat_id, message='Не удалось отрендерить содержимое HTML. Вылетел эксепшн '+type(ex).__name__+'. Вывожу тело сообщения обычным текстом:', random_id=random.getrandbits(64))
+			vk_api.messages.send(peer_id=chat_id, message='Не удалось отрендерить содержимое HTML. Вылетел эксепшн '+type(ex).__name__+'. Вывожу тело письма обычным текстом:', random_id=random.getrandbits(64))
 			printPlain(soup.text)
 	
 
@@ -93,6 +99,7 @@ for item in mail:
 	if item.to_recipients is not None and group_email in item.to_recipients or item.cc_recipients is not None and group_email in item.cc_recipients or item.bcc_recipients is not None and group_email in item.bcc_recipients:
 		if str(item.datetime_received) == str(last_email):
 			exit(0)
+		item.body = replaceAttachmentWithBase64(item.body, item.attachments)
 		processLetter(item)
 		attachs = list()
 		uploadedattachs = ''
