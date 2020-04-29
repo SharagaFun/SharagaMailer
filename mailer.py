@@ -64,7 +64,7 @@ def processLetter(item, attached=False):
 			else:
 				pfile = post(vk_api.photos.getMessagesUploadServer(peer_id = chat_id)['upload_url'], files = {'photo': ('pic.png', picture)}).json()
 				photo = vk_api.photos.saveMessagesPhoto(server = pfile['server'], photo = pfile['photo'], hash = pfile['hash'])[0]
-				vk_api.messages.send(peer_id=chat_id, message='Содержание письма:', attachment = 'photo%s_%s'%(photo['owner_id'], photo['id']), random_id=random.getrandbits(64))
+				vk_api.messages.send(peer_id=chat_id, message='Содержимое письма:', attachment = 'photo%s_%s'%(photo['owner_id'], photo['id']), random_id=random.getrandbits(64))
 				links = [a.get('href') for a in soup.find_all('a', href=True)]
 				if links is not None and len(links) > 0:
 					vk_api.messages.send(peer_id=chat_id, message='Ссылки из письма:\n'+'\n'.join(set(links)), random_id=random.getrandbits(64))
