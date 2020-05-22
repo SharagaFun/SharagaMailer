@@ -87,7 +87,7 @@ dmail = sorted(dmail, key = lambda i: i.datetime_received, reverse=True)
 	
 for item in dmail:
 	if item.to_recipients is not None and group_email in item.to_recipients or item.cc_recipients is not None and group_email in item.cc_recipients or item.bcc_recipients is not None and group_email in item.bcc_recipients:
-		if parser.parse(str(item.datetime_received)) > parser.parse(str(last_email)) and not written:
+		if parser.parse(str(item.datetime_received)) <= parser.parse(str(last_email)) and not written:
 			exit(0)
 		if not written:
 			written = True
