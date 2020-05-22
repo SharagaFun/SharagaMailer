@@ -6,6 +6,7 @@ from requests import post
 from bs4 import BeautifulSoup
 from transliterate import translit
 import base64
+from dateutil import parser
 
 
 vk_bad_files = ('html', 'htm', 'zip', 'exe', 'rar', 'js')
@@ -86,7 +87,7 @@ dmail = sorted(dmail, key = lambda i: i.datetime_received, reverse=True)
 	
 for item in dmail:
 	if item.to_recipients is not None and group_email in item.to_recipients or item.cc_recipients is not None and group_email in item.cc_recipients or item.bcc_recipients is not None and group_email in item.bcc_recipients:
-		if str(item.datetime_received) == str(last_email) and not written:
+		if parser.parse(str(item.datetime_received)) > parser.parse(str(last_email)) and not written:
 			exit(0)
 		if not written:
 			written = True
