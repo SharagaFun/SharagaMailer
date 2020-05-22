@@ -5,6 +5,9 @@ import random
 from requests import post
 from bs4 import BeautifulSoup
 from transliterate import translit
+from io import BytesIO
+from PIL import Image
+import random
 import base64
 from dateutil import parser
 
