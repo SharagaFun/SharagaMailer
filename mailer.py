@@ -55,7 +55,7 @@ def processLetter(item, attached=False):
 		msg += '\n БЕГИТЕ ЧИТАТЬ РОНЯЯ КАЛ, ПОСАНЫ!11'
 	
 	vk_api.messages.send(peer_id=chat_id, message=msg, random_id=random.getrandbits(64))
-	if not BeautifulSoup(item.body, "html.parser").find():
+	if not BeautifulSoup(item.body, "html.parser").find() or not '</html>' in item.body:
 		printPlain(item.body)
 	else:
 		soup = BeautifulSoup(item.body, 'lxml')
@@ -103,6 +103,7 @@ for item in mail:
 	if item.to_recipients is not None and group_email in item.to_recipients or item.cc_recipients is not None and group_email in item.cc_recipients or item.bcc_recipients is not None and group_email in item.bcc_recipients:
 		if parser.parse(str(item.datetime_received)) <= parser.parse(str(last_email)):
 			exit(0)
+		print (item.body)
 		item.body = replaceAttachmentWithBase64(item.body, item.attachments)
 		processLetter(item)
 		attachs = list()
@@ -125,3 +126,4 @@ for item in mail:
 					uploadedattachs+='doc%s_%s,'%(u['owner_id'], u['id'])
 			uploadedattachs=uploadedattachs[:-1]
 			vk_api.messages.send(peer_id=chat_id, message='Вложения:', attachment = uploadedattachs, random_id=random.getrandbits(64))
+			
